@@ -1,0 +1,376 @@
+{UTF-8}
+********************************************************
+	.covid-19 simple
+********************************************************~
+		Copyright 2020 Tom Fiddaman, Ventana Systems, Inc.
+		
+		Permission is hereby granted, free of charge, to any person obtaining a copy of this \
+		software and associated documentation files (the "Software"), to deal in \
+		the Software without restriction, including without limitation the rights \
+		to use, copy, modify, merge, publish, distribute, sublicense, and/or sell \
+		copies of the Software, and to permit persons to whom the Software is \
+		furnished to do so, subject to the following conditions:
+		
+		The above copyright notice and this permission notice shall be included in all \
+		copies or substantial portions of the Software.
+		
+		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR \
+		IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, \
+		FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL \
+		THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER \
+		LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING \
+		FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER \
+		DEALINGS IN THE SOFTWARE.
+	|
+
+Fatality Rate= INTEG (
+	Change in Fatality Rate,
+		Short Term Fatality Rate)
+	~	fraction
+	~		|
+
+Change in Fatality Rate=
+	IF THEN ELSE( Time<=Action Start Time , 0 , (Long Term Fatality Rate-Fatality Rate)/\
+		Time to Implement Long Term Fatality Rate )
+	~	fraction/day
+	~		|
+
+Regulation Duration=
+	48
+	~	days
+	~		|
+
+Dying=
+	Infected*Fatality Rate/Infection Duration
+	~	people/day
+	~		|
+
+Time to Implement Long Term Fatality Rate=
+	43
+	~	days
+	~		|
+
+Distancing Effectiveness Change=
+	IF THEN ELSE(Time<Action Start Time,0, IF THEN ELSE(Time<=(Action Start Time+Regulation Duration\
+		),(Regulated Distancing Effectiveness
+	-Effectiveness of Distancing)/Regulated Distancing Change Time,(Voluntary Distancing Effectiveness\
+		-Effectiveness of Distancing
+	)/Voluntary Distancing Change Time))
+	~	fraction/day
+	~		|
+
+Long Term Fatality Rate=
+	0
+	~	fraction
+	~		|
+
+Reproduction Rate=
+	Uncontrolled Infection Rate*(1-Effectiveness of Distancing)*(1-Effectiveness of Isolation\
+		)
+	~	people/person/day
+	~		|
+
+Recovering=
+	Infected*(1-Fatality Rate)/Infection Duration
+	~	people/day
+	~		|
+
+Short Term Fatality Rate=
+	0.15
+	~	fraction
+	~		|
+
+Voluntary Distancing Change Time=
+	1
+	~	days
+	~		|
+
+Infected= INTEG (
+	Infecting-Dying-Recovering,
+		Initial Infected)
+	~	people
+	~		|
+
+Initial Infected=
+	1
+	~	people
+	~		|
+
+Isolation Effectiveness Change=
+	(Maximum Isolation Effectiveness-Effectiveness of Isolation)/Isolation Effectiveness Change Time
+	~	fraction/day
+	~		|
+
+Controlled Reproduction Rate=
+	Reproduction Rate*Infection Duration
+	~	people/person
+	~		|
+
+Voluntary Distancing Effectiveness=
+	0.28
+	~	fraction
+	~		|
+
+Maximum Isolation Effectiveness=
+	IF THEN ELSE(Time<=Action Start Time, 0, (Infection Duration-Time to Get Tested)/Infection Duration\
+		)
+	~	fraction
+	~		|
+
+Regulated Distancing Effectiveness=
+	1
+	~	fraction
+	~		|
+
+Infecting=
+	(Susceptible/Initial Susceptible)*Infected*Reproduction Rate
+	~	people/day
+	~		|
+
+Initial Susceptible=
+	2.001e+008
+	~	people
+	~		|
+
+Susceptible= INTEG (
+	-Infecting,
+		Initial Susceptible)
+	~	people
+	~		|
+
+Effectiveness of Isolation= INTEG (
+	Isolation Effectiveness Change,
+		0)
+	~	fraction
+	~		|
+
+Effectiveness of Distancing= INTEG (
+	Distancing Effectiveness Change,
+		0)
+	~	fraction
+	~		|
+
+Time to Get Tested=
+	5
+	~	days
+	~		|
+
+Deaths= INTEG (
+	Dying,
+		0)
+	~	people
+	~		|
+
+Regulated Distancing Change Time=
+	270
+	~	days
+	~		|
+
+Isolation Effectiveness Change Time=
+	60
+	~	days
+	~		|
+
+Seasonal Period=
+	365
+	~	days
+	~	One year
+	|
+
+Peak Season=
+	0
+	~	day
+	~		|
+
+Recovered= INTEG (
+	Recovering,
+		0)
+	~	people
+	~		|
+
+Action Start Time=
+	30
+	~	day
+	~		|
+
+Infection Duration=
+	21
+	~	day
+	~		|
+
+Uncontrolled Reproduction Rate=
+	3.91
+	~	dmnl
+	~		|
+
+Uncontrolled Infection Rate=
+	Uncontrolled Reproduction Rate/Infection Duration
+	~	people/person/day
+	~		|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 365
+	~	day
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	day
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP
+	~	day [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 0.125
+	~	day [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$192-192-192,0,Arial|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,5,0
+10,1,Infected,1183,267,55,32,3,131,0,0,-1,0,0,0
+10,2,Recovered,1515,254,54,30,3,131,0,0,-1,0,0,0
+10,3,Uncontrolled Infection Rate,531,471,72,26,8,3,0,0,0,0,0,0
+10,4,Uncontrolled Reproduction Rate,677,539,59,57,8,131,0,2,0,0,0,0,0-0-0,0-0-0,|12||128-0-0
+1,5,4,3,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(570,520)|
+10,6,Infection Duration,1400,158,36,26,8,3,0,2,0,0,0,0,0-0-0,0-0-0,|12||128-0-0
+1,7,9,2,4,0,0,22,0,0,0,-1--1--1,,1|(1409,257)|
+1,8,9,1,100,0,0,22,0,0,0,-1--1--1,,1|(1291,257)|
+11,9,348,1351,257,6,8,34,3,0,0,1,0,0,0
+10,10,Recovering,1351,281,46,16,40,3,0,0,-1,0,0,0
+1,11,1,10,1,0,0,12,1,128,0,0-128-0,|12||0-0-0,1|(1228,293)|
+1,12,6,9,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1392,224)|
+10,13,Infection Duration,576,615,41,26,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,14,13,3,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(520,576)|
+10,15,Action Start Time,504,141,56,44,8,131,0,2,0,0,0,0,0-0-0,0-0-0,|12||0-128-0
+10,16,Regulated Distancing Effectiveness,466,393,61,37,8,131,0,2,0,0,0,0,0-0-0,0-0-0,|12||0-128-0
+10,17,Reproduction Rate,769,362,53,26,8,3,0,0,0,0,0,0
+1,18,3,17,1,0,0,0,1,64,0,0-0-0,|12||0-0-0,1|(706,369)|
+10,19,Deaths,1173,91,53,23,3,131,0,0,0,0,0,0
+10,20,TIME STEP,961,160,57,16,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,21,Peak Season,897,438,53,16,8,3,1,2,0,0,0,0,0-0-0,0-0-0,|12||128-128-128
+10,22,Seasonal Period,597,395,64,16,8,3,1,2,0,0,0,0,0-0-0,0-0-0,|12||128-128-128
+10,23,Time,569,480,33,16,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,24,Regulated Distancing Change Time,328,421,60,46,8,131,0,0,0,0,0,0
+10,25,Effectiveness of Distancing,645,235,73,29,3,131,0,0,0,0,0,0
+12,26,48,359,221,10,8,0,3,0,0,-1,0,0,0
+1,27,29,25,4,0,0,22,0,0,0,-1--1--1,,1|(517,223)|
+1,28,29,26,100,0,0,22,0,0,0,-1--1--1,,1|(409,223)|
+11,29,48,456,223,6,8,34,3,0,0,1,0,0,0
+10,30,Distancing Effectiveness Change,456,269,53,38,40,131,0,0,-1,0,0,0
+1,31,25,30,1,0,0,0,0,64,0,-1--1--1,,1|(574,287)|
+10,32,Effectiveness of Isolation,919,593,65,33,3,131,0,0,0,0,0,0
+12,33,48,1176,590,10,8,0,3,0,0,-1,0,0,0
+1,34,36,32,4,0,0,22,0,0,0,-1--1--1,,1|(1022,590)|
+1,35,36,33,100,0,0,22,0,0,0,-1--1--1,,1|(1119,590)|
+11,36,48,1067,590,6,8,34,3,0,0,1,0,0,0
+10,37,Isolation Effectiveness Change,1067,625,49,27,40,3,0,0,-1,0,0,0
+10,38,Maximum Isolation Effectiveness,1078,751,68,29,8,131,0,0,0,0,0,0
+10,39,Isolation Effectiveness Change Time,1259,569,62,27,8,3,0,0,0,0,0,0
+1,40,32,37,1,0,0,0,0,64,0,-1--1--1,,1|(955,648)|
+1,41,39,37,1,0,0,0,0,64,0,-1--1--1,,1|(1196,654)|
+1,42,38,37,1,0,0,0,0,64,0,-1--1--1,,1|(1085,731)|
+1,43,45,19,4,0,0,22,0,0,0,-1--1--1,,1|(1178,139)|
+1,44,45,1,100,0,0,22,0,0,0,-1--1--1,,1|(1178,206)|
+11,45,620,1178,171,8,6,33,3,0,0,4,0,0,0
+10,46,Dying,1228,171,42,10,40,3,0,0,-1,0,0,0
+1,47,1,46,1,0,0,0,0,64,0,-1--1--1,,1|(1218,237)|
+1,48,6,46,1,0,0,0,0,64,0,-1--1--1,,1|(1298,160)|
+1,49,25,17,1,0,0,0,0,64,0,-1--1--1,,1|(682,311)|
+1,50,32,17,1,0,0,0,0,64,0,-1--1--1,,1|(857,575)|
+10,51,Time to Get Tested,862,796,43,18,8,3,0,0,0,0,0,0
+10,52,Infection Duration,1246,793,36,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,53,51,38,1,0,0,0,0,64,0,-1--1--1,,1|(966,810)|
+1,54,52,38,1,0,0,0,0,64,0,-1--1--1,,1|(1169,813)|
+10,55,Susceptible,912,272,54,31,3,131,0,0,0,0,0,0
+1,56,58,1,4,0,0,22,0,0,0,-1--1--1,,1|(1090,270)|
+1,57,58,55,100,0,0,22,0,0,0,-1--1--1,,1|(1003,270)|
+11,58,668,1047,270,6,8,34,3,0,0,1,0,0,0
+10,59,Infecting,1047,288,31,10,40,3,0,0,-1,0,0,0
+1,60,17,59,1,0,0,0,0,64,0,-1--1--1,,1|(895,405)|
+1,61,1,59,1,0,0,0,0,64,0,-1--1--1,,1|(1156,319)|
+10,62,Initial Susceptible,929,104,44,18,8,3,0,0,0,0,0,0
+1,63,62,55,1,0,0,0,0,64,1,-1--1--1,,1|(946,160)|
+1,64,62,58,1,0,0,0,0,64,0,-1--1--1,,1|(992,156)|
+1,65,55,59,1,0,0,0,0,64,0,-1--1--1,,1|(966,322)|
+10,66,Voluntary Distancing Effectiveness,254,275,50,39,8,131,0,0,0,0,0,0
+10,67,Time,271,162,29,10,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,68,Action Start Time,867,715,48,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,69,68,38,1,0,0,0,0,64,0,-1--1--1,,1|(913,740)|
+10,70,Time,995,849,29,10,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,71,70,38,1,0,0,0,0,64,0,-1--1--1,,1|(1038,841)|
+10,72,Time,1785,202,29,10,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,73,Controlled Reproduction Rate,363,565,69,18,8,3,0,0,0,0,0,0
+1,74,17,73,1,0,0,0,0,64,0,-1--1--1,,1|(569,388)|
+1,75,13,73,1,0,0,0,0,64,0,-1--1--1,,1|(503,653)|
+10,76,Initial Infected,1264,409,49,10,8,3,0,0,0,0,0,0
+1,77,76,1,1,0,0,0,0,64,1,-1--1--1,,1|(1238,384)|
+10,78,Voluntary Distancing Change Time,228,357,70,27,8,3,0,0,0,0,0,0
+10,79,Long Term Fatality Rate,1654,-26,46,18,8,3,0,0,0,0,0,0
+10,80,Time to Implement Long Term Fatality Rate,1895,40,69,27,8,3,0,0,0,0,0,0
+10,81,Short Term Fatality Rate,1492,-9,46,18,8,3,0,0,0,0,0,0
+1,82,67,30,1,0,0,0,0,64,0,-1--1--1,,1|(284,208)|
+1,83,15,30,1,0,0,0,0,64,0,-1--1--1,,1|(473,161)|
+1,84,66,30,1,0,0,0,0,64,0,-1--1--1,,1|(312,312)|
+1,85,78,30,1,0,0,0,0,64,0,-1--1--1,,1|(324,364)|
+1,86,24,30,1,0,0,0,0,64,0,-1--1--1,,1|(384,381)|
+1,87,16,30,1,0,0,0,0,64,0,-1--1--1,,1|(479,326)|
+10,88,Fatality Rate,1533,71,55,31,3,131,0,0,0,0,0,0
+12,89,48,1802,77,10,8,0,3,0,0,-1,0,0,0
+1,90,92,88,4,0,0,22,0,0,0,-1--1--1,,1|(1642,78)|
+1,91,92,89,100,0,0,22,0,0,0,-1--1--1,,1|(1750,78)|
+11,92,48,1703,78,6,8,34,131,0,0,1,0,0,0
+10,93,Change in Fatality Rate,1703,104,46,18,40,3,0,0,-1,0,0,0
+1,94,81,88,1,0,0,0,0,64,1,-1--1--1,,1|(1495,9)|
+1,95,88,46,1,0,0,0,0,64,0,-1--1--1,,1|(1285,118)|
+1,96,88,10,1,0,0,0,0,64,0,-1--1--1,,1|(1444,220)|
+1,97,79,93,1,0,0,0,0,64,0,-1--1--1,,1|(1626,14)|
+1,98,80,93,1,0,0,0,0,64,0,-1--1--1,,1|(1829,103)|
+1,99,72,93,1,0,0,0,0,64,0,-1--1--1,,1|(1732,195)|
+10,100,Regulation Duration,327,104,40,18,8,3,0,0,0,0,0,0
+1,101,100,30,1,0,0,0,0,64,0,-1--1--1,,1|(336,195)|
+1,102,88,93,1,0,0,0,0,64,0,-1--1--1,,1|(1564,126)|
+10,103,Action Start Time,1876,153,48,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,104,103,93,1,0,0,0,0,64,0,-1--1--1,,1|(1823,158)|
+///---\\\
+:GRAPH Infection_Sources
+:TITLE Infection Sources
+:SCALE
+:VAR Infecting
+:VAR Importing Exposed
+:VAR Importing Infected
+:VAR Intercepting
+:L<%^E!@
+1:Distancing and Isolating.vdf
+9:Distancing and Isolating
+22:day,days
+22:dmnl,index
+22:people,person
+23:0
+15:0,0,0,0,0,0
+19:5,0
+27:0,
+34:0,
+4:Time
+5:Infection Duration
+35:Date
+36:YYYY-MM-DD
+37:2020
+38:3
+39:1
+40:4
+41:1
+24:0
+25:365
+26:365
